@@ -1,0 +1,29 @@
+sudo: false
+
+language: node_js
+node_js:
+  - 8
+
+before_install:
+  - npm install codecov.io coveralls
+
+after_success:
+  - cat ./coverage/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js
+  - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+  - npm run build
+  - nwb build-demo
+
+deploy:
+  - provider: pages
+    name: Github Pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    local_dir: demo/dist
+    on:
+      branch: master
+  - provider: npm
+    name: NPM
+    email: $NPM_EMAIL
+    api_key: $NPM_AUTH_TOKEN
+    on:
+      tags: true
